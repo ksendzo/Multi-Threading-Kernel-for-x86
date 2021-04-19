@@ -26,6 +26,7 @@ public:
 	ID getId();
 	static ID getRunningId();
 	static Thread* getThreadById(ID id);
+	volatile PCB* getMyPCB() volatile;
 protected:
 	friend class PCB;
 	Thread(StackSize stackSize = defaultStackSize, Time timeSlice = defaultTimeSlice);
@@ -33,7 +34,8 @@ protected:
 
 private:
 	PCB* myPCB;
-
 };
+
+void dispatch();
 
 #endif /* THREAD_H_ */

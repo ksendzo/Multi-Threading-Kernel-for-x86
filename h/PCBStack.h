@@ -14,9 +14,9 @@ typedef int ID;
 
 class PCBStack {
 	struct Node {
-		PCB* info;
+		volatile PCB* info;
 		Node *next;
-		Node(PCB* info, Node* next = 0):info(info), next(next){}
+		Node(volatile PCB* info, Node* next = 0):info(info), next(next){}
 	};
 
 	Node *top;
@@ -24,12 +24,13 @@ public:
 	PCBStack();
 	virtual ~PCBStack();
 
-	void push(PCB*);
-	PCB* pop();
+	void push(volatile PCB*) volatile;
+	volatile PCB* pop() volatile;
+	void removeMe(volatile PCB*) volatile;
 
-	int isEmpty();
+	int isEmpty() volatile;
 
-	PCB* find(ID id);
+	volatile PCB* find(ID id) volatile;
 };
 
 #endif /* PCBLIST_H_ */

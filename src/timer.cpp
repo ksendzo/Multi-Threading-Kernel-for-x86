@@ -4,32 +4,28 @@
 #include <stdio.h>
 #include <iostream.h>
 #include "System.h"
+#include "Idle.h"
 
-//extern volatile int cntr;
-extern volatile int context_switch_on_demand;
+//extern volatile int System::isDispatch;
 
-//extern  unsigned tsp, tss, tbp;
-extern volatile PCB* running;
-
-//extern unsigned oldTimerOFF, oldTimerSEG;
 void inicTimer();
 void restoreTimer();
 
-void tick(){
-	printf(".");
-}
-
+//void tick(){
+//	printf(".");
+//}
+void tick();
 // nova prekidna rutina tajmera
 void interrupt timer(){
 	static unsigned tsp, tss, tbp;
 	static unsigned int timerCnt = 0;
-	if (!context_switch_on_demand){
+	if (!System::isDispatch){
 		if(timerCnt > 0)
 			timerCnt--;
 		tick();
 	}
 
-	if (context_switch_on_demand || (timerCnt == 0 && running->timeSlice > 0)) {
+	if (System::isDispatch || (timerCnt == 0 && System::running->timeSlice > 0)) {
 		asm {
 			// cuva sp
 			mov tsp, sp
@@ -37,35 +33,29 @@ void interrupt timer(){
 			mov tbp, bp
 		}
 
-		running->sp = tsp;
-		running->ss = tss;
-		running->bp = tbp;
+		System::running->sp = tsp;
+		System::running->ss = tss;
+		System::running->bp = tbp;
 
-		// scheduler
-		//cout << "old running = " << running->ss << ":" << running->sp << endl;
+//		if(System::running->state == PCB::FINISHED)
+//			printf("gotova nit\n");
 
-		if(running->finished == 1)
-			printf("gotova nit\n");
-		else {
-
-		if(running->finished == 0){
-//			printf("\tScheduler::put\n");
-			Scheduler::put((PCB*)running);
+		if(System::running->state == PCB::READY){
+			Scheduler::put((PCB*)System::running);
 		}
-//		cout << "\t\t\tTIMER" << endl;
+
+		System::running = Scheduler::get();
+
+		if(System::running == 0){
+			printf("idle\n");
+			System::running = System::idle->getMyPCB();
 		}
-		running = Scheduler::get();
 
-		if(running == 0)
-			cout << "greskaaaaaaaaaaaaaaaaaaaaaaa" << endl;
-//		else
-//			cout << "new running = " << running->ss << ":" << running->sp << endl;
+		timerCnt = System::running->timeSlice;
 
-		timerCnt = running->timeSlice;
-
-		tsp = running->sp;
-		tss = running->ss;
-		tbp = running->bp;
+		tsp = System::running->sp;
+		tss = System::running->ss;
+		tbp = System::running->bp;
 
 		asm {
 			// restaurira sp
@@ -80,9 +70,9 @@ void interrupt timer(){
 	// poziva se samo kada nije zahtevana promena konteksta
 	// tako da se stara rutina poziva
 	// samo kada je stvarno doslo do prekida
-	if(!context_switch_on_demand) asm int 60h;
+	if(!System::isDispatch) asm int 60h;
 
-	context_switch_on_demand = 0;
+	System::isDispatch = 0;
 }
 
 

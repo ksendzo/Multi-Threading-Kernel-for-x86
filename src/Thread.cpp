@@ -14,18 +14,20 @@
 #include <stdio.h>
 #include "System.h"
 
-extern volatile PCB* running;
+//extern volatile PCB* System::running;
 
 void dispatch();
 
 
 Thread::Thread(StackSize stackSizeParam, Time timeSlice) {
-	myPCB = new PCB(this,
+	myPCB = new PCB(
 				((stackSizeParam<maxStackSize)?stackSizeParam:maxStackSize) / sizeof(unsigned),
-				timeSlice);
+				timeSlice,
+				this);
 }
 
 Thread::~Thread() {
+	myPCB->waitToComplete();
 	if(myPCB != 0)
 		delete myPCB;
 }
@@ -38,9 +40,10 @@ void Thread::start(){
 
 
 void Thread::waitToComplete(){
-	if(myPCB == 0)
-		printf("PCB == 0 waitToComplete\n");
-	else
+//	if(myPCB == NULL)
+//		printf("PCB == 0 waitToComplete\n");
+//	else
+//	printf("PCB->id = %d\n", )
 		myPCB->waitToComplete();
 }
 
@@ -48,13 +51,29 @@ void Thread::waitToComplete(){
 ID Thread::getId(){
 	if(myPCB)
 		return myPCB->id;
+	else
+		return -1;
 }
 
 
 ID Thread::getRunningId(){
-	return running->id;
+	return System::running->id;
 }
 
 Thread* Thread::getThreadById(ID id){
-	return NULL;
+	return PCB::getThreadById(id);
 }
+
+
+volatile PCB* Thread::getMyPCB() volatile {
+	return (volatile PCB*)myPCB;
+}
+
+
+
+
+
+
+
+
+

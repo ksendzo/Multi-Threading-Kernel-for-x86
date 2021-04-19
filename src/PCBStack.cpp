@@ -21,25 +21,48 @@ PCBStack::~PCBStack() {
 
 
 
-void PCBStack::push(PCB* newPCB){
+void PCBStack::push(volatile PCB* newPCB) volatile {
 	top = new Node(newPCB, top);
 }
 
-PCB* PCBStack::pop() {
+volatile PCB* PCBStack::pop() volatile {
 	if(isEmpty())
 		return 0;
 
 	Node *temp = top;
 	top = top->next;
+	volatile PCB* ret = temp->info;
 	temp->next = 0;
-	PCB* ret = temp->info;
+	temp->info = 0;
 	delete temp;
 
 	return ret;
 }
 
 
-int PCBStack::isEmpty(){
+void PCBStack::removeMe(volatile PCB* me) volatile {
+	Node* temp = top;
+	Node* last = top;
+
+	while(temp && temp->info != me){
+		last = temp;
+		temp = temp->next;
+	}
+
+	if(!temp)
+		return;
+
+	if(temp == top)
+		top = top->next;
+	else
+		last->next = temp->next;
+
+	temp->next = 0;
+	delete temp;
+}
+
+
+int PCBStack::isEmpty() volatile {
 	if(top == 0)
 		return 1;
 	else
@@ -47,12 +70,13 @@ int PCBStack::isEmpty(){
 }
 
 
-PCB* PCBStack::find(ID id){
+volatile PCB* PCBStack::find(ID id) volatile{
 	Node *temp = top;
 
 	while(temp != 0){
 		if(temp->info != 0 && temp->info->id == id)
 			return temp->info;
+		temp = temp->next;
 	}
 	return 0;
 }

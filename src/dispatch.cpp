@@ -7,24 +7,20 @@
 //#include "SCHEDULE.H"
 //#include "PCB.h"
 #include <iostream.h>
-
-class PCB;
+#include "System.h"
+#include <stdio.h>
 
 void interrupt timer();
-extern volatile unsigned tsp, tss;
-//extern volatile PCB* running;
-extern volatile int context_switch_on_demand;
-
 
 void dispatch(){
 
-	asm cli;
-	cout << "\t\t\t\tdispatch\n";
-	context_switch_on_demand = 1;
-	asm sti;
+	System::lock();
+//	cout << "\t\t\t\tdispatch\n";
+	System::isDispatch = 1;
+	System::unlock();
+//	printf("w\n");
 	asm int 08h;
-
-
+//	printf("f\n");
 }
 
 

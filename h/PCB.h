@@ -18,17 +18,21 @@ typedef int ID;
 
 class PCB {
 public:
-	PCB(Thread*, StackSize, Time);
-	PCB();
+	PCB(StackSize, Time, Thread* = 0);
+//	PCB();
 	virtual ~PCB();
+
+	enum State { CREATED, READY, FINISHED, BLOCKED };
 
 	volatile unsigned sp;
 	volatile unsigned ss;
 	volatile unsigned bp;
 	volatile unsigned* stack;
 	volatile unsigned stackSize;
-	volatile int finished;
+	volatile State state;
 	volatile int timeSlice;
+
+	static ID idCnt;
 	volatile ID id;
 
 	volatile PCBStack *waitingForMeStack;
@@ -38,6 +42,7 @@ public:
 
 	void start();
 	void waitToComplete();
+	static Thread* getThreadById(ID);
 
 };
 

@@ -10,21 +10,26 @@
 
 class PCB;
 class PCBStack;
+class Idle;
 
 class System {
 public:
-	System();
-	virtual ~System();
 
-//	static volatile PCB* running;
+	static volatile PCB* running;
+	static volatile PCB* mainPCB;
+	static volatile Idle* idle;
 	static PCBStack* ListOfPCB;
+
+	static volatile int isDispatch;
+	static volatile int lockCnt;
 
 	static void init();
 	static void reset();
 
-	//static unsigned keepOldTimerOFF, keepOldTimerSEG;
-//	static void inicTimer();
-//	static void restoreTimer();
+	static void lock();
+	static void unlock();
+
+
 };
 
 #endif /* SYSTEM_H_ */
