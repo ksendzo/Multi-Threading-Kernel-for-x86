@@ -82,8 +82,20 @@ volatile PCB* PCBStack::find(ID id) volatile{
 }
 
 
+volatile PCB* PCBStack::first() volatile {
+	iterator = top;
+	if(iterator)
+		return iterator->info;
+	return 0;
+}
 
-
-
+volatile PCB* PCBStack::next() volatile {
+	if(!iterator)
+		return 0;
+	iterator = iterator->next;
+	if(iterator)
+		return iterator->info;
+	return 0;
+}
 
 

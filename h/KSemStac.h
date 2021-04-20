@@ -17,7 +17,8 @@ class KSemStack {
 			Node(volatile KernelSem* info, Node* next = 0):info(info), next(next){}
 		};
 
-		Node *topNode;
+	Node *topNode;
+	Node *iterator;
 public:
 	KSemStack();
 	virtual ~KSemStack();
@@ -27,6 +28,9 @@ public:
 	volatile KernelSem* top() volatile;
 
 	void removeMe(volatile KernelSem*) volatile;
+
+	volatile KernelSem* first() volatile;
+	volatile KernelSem* next() volatile;
 
 	int isEmpty() volatile;
 

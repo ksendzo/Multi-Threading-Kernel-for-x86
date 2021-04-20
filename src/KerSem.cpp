@@ -11,19 +11,61 @@
 #include "PCB.h"
 #include "SCHEDULE.H"
 #include <stdio.h>
+#include "KSemStac.h"
 
 void dispatch();
 
 KernelSem::KernelSem(int init) {
 
+	System::lock();
 	value = init;
 	blockedList = new PCBStack;
+
+	if(System::listOfSemaphores == 0)
+		System::listOfSemaphores = new KSemStack;
+	System::listOfSemaphores->push(this);
+	System::unlock();
 }
 
 KernelSem::~KernelSem() {
+	if(!blockedList->isEmpty())
+		printf("ostalo je blokiranih niti na semaforu!\n");
+	System::lock();
 	delete blockedList;
+	System::listOfSemaphores->removeMe(this);
+	if(System::listOfSemaphores->isEmpty()){
+		delete System::listOfSemaphores;
+		System::listOfSemaphores = 0;
+	}
+	System::unlock();
 }
 
+
+int KernelSem::tick() volatile{		//	tikni sve niti koje su na ovom sem
+	System::lock();
+
+	PCBStack* PCBToRemove = new PCBStack;
+
+	for(volatile PCB* i = blockedList->first(); i != 0; i = blockedList->next()){
+		if(i->tick()) {
+//			printf("to remove %d\n", i->id);
+			PCBToRemove->push(i);
+		}
+	}
+
+	volatile PCB* temp = PCBToRemove->pop();
+
+	while(temp){
+		blockedList->removeMe(temp);
+		value++;
+//		printf("free\n");
+		temp = PCBToRemove->pop();
+	}
+
+	delete PCBToRemove;
+
+	System::unlock();
+}
 
 
 
@@ -35,6 +77,7 @@ int KernelSem::val() const {
 int KernelSem::wait(Time t){
 	System::lock();
 	value--;
+//	printf("wait = %d\n", value);
 	if(value >= 0){				// ima dovoljno val da samo nastavi daje
 		System::unlock();
 		return 0;				// VIDI STA VRACA
@@ -64,6 +107,7 @@ int KernelSem::wait(Time t){
 void KernelSem::signal(){
 	System::lock();
 	value++;
+//	printf("signal = %d\n", value);
 	if(value > 0){			// 	Niko nije bio blokiran
 		System::unlock();
 		return;

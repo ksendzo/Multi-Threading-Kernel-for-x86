@@ -24,7 +24,7 @@ void Idle::run() {
 	while(1){
 		for(int i = 0; i < 30000; i++)
 			for(int j = 0; j < 30000; j++);
-		printf("in idle\n");
+//		printf("in idle\n");
 	}
 }
 

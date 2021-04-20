@@ -20,6 +20,7 @@ class PCBStack {
 	};
 
 	Node *top;
+	Node *iterator;
 public:
 	PCBStack();
 	virtual ~PCBStack();
@@ -27,6 +28,9 @@ public:
 	void push(volatile PCB*) volatile;
 	volatile PCB* pop() volatile;
 	void removeMe(volatile PCB*) volatile;
+
+	volatile PCB* first() volatile;
+	volatile PCB* next() volatile;
 
 	int isEmpty() volatile;
 

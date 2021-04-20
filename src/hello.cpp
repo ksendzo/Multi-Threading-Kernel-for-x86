@@ -70,6 +70,12 @@ void syncPrintf(char* pr, int a){
 	System::unlock();
 }
 
+void syncPrintf(char* pr, int a, int b){
+	System::lock();
+	printf(pr, a, b);
+	System::unlock();
+}
+
 void syncPrintf(char* pr, int a, int b, char c){
 	System::lock();
 	printf(pr, a, b, c);
@@ -81,16 +87,21 @@ void syncPrintf(char* pr, int a, int b, char c){
 
 
 
-const int n = 5;
-int count = 10;
 
-Semaphore s(2);
+int t=-1;
+
+const int n=15;
+
+Semaphore s(1);
 
 class TestThread : public Thread
 {
+private:
+	Time waitTime;
+
 public:
 
-	TestThread(): Thread(){}
+	TestThread(Time WT): Thread(), waitTime(WT){}
 	~TestThread()
 	{
 		waitToComplete();
@@ -103,32 +114,41 @@ protected:
 
 void TestThread::run()
 {
-	s.wait(0);
-	cout<<"Thread "<<getId()<<" in critical section."<<endl;
-	for(unsigned int i=0;i<64000;i++)
-		for(unsigned int j=0;j<64000;j++);
-	cout << "Thread " << getId() << " finished critical section." << endl;
-	s.signal();
+	syncPrintf("Thread %d waits for %d units of time.\n",getId(),waitTime);
+	int r = s.wait(waitTime);
+	if(getId()%2)
+		s.signal();
+	syncPrintf("Thread %d finished: r = %d\n", getId(),r);
 }
 
-void tick(){}
+void tick()
+{
+	t++;
+	if(t)
+		syncPrintf("%d\n",t);
+}
 
 int userMain(int argc, char** argv)
 {
 	syncPrintf("Test starts.\n");
-	TestThread t[n];
+	TestThread* t[n];
 	int i;
 	for(i=0;i<n;i++)
 	{
-		t[i].start();
+		t[i] = new TestThread(5*(i+1));
+		t[i]->start();
 	}
 	for(i=0;i<n;i++)
 	{
-		t[i].waitToComplete();
+		t[i]->waitToComplete();
 	}
+	for(i = 0; i < n; i++)
+		delete t[i];
+	delete t;
 	syncPrintf("Test ends.\n");
 	return 0;
 }
+
 
 
 

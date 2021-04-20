@@ -88,3 +88,30 @@ volatile KernelSem* KSemStack::top() volatile{
 //}
 
 
+volatile KernelSem* KSemStack::first() volatile {
+	iterator = topNode;
+	if(iterator)
+		return iterator->info;
+	return 0;
+}
+
+
+volatile KernelSem* KSemStack::next() volatile {
+	if(!iterator)
+		return 0;
+	iterator = iterator->next;
+	if(iterator)
+		return iterator->info;
+	return 0;
+}
+
+
+
+
+
+
+
+
+
+
+

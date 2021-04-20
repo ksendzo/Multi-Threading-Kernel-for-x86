@@ -43,6 +43,7 @@ public:
 
 	Thread* myThread;
 	static void wrapper();
+	int tick() volatile;
 
 	void start();
 	void waitToComplete();

@@ -22,6 +22,7 @@ void interrupt timer(){
 	if (!System::isDispatch){
 		if(timerCnt > 0)
 			timerCnt--;
+		System::tickSemaphores();
 		tick();
 	}
 
@@ -47,7 +48,7 @@ void interrupt timer(){
 		System::running = Scheduler::get();
 
 		if(System::running == 0){
-			printf("idle\n");
+//			printf("idle\n");
 			System::running = System::idle->getMyPCB();
 		}
 

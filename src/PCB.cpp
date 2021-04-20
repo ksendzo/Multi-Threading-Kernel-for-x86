@@ -65,7 +65,7 @@ PCB::PCB(StackSize stackSize, Time timeSlice, Thread* thread) {
 	else {
 		state = READY;
 	}
-	System::ListOfPCB->push(this);
+	System::listOfPCB->push(this);
 	System::unlock();
 }
 
@@ -83,7 +83,7 @@ PCB::PCB(StackSize stackSize, Time timeSlice, Thread* thread) {
 PCB::~PCB() {
 	waitToComplete();
 	System::lock();
-	System::ListOfPCB->removeMe(this);
+	System::listOfPCB->removeMe(this);
 	System::unlock();
 	if(stack != 0)
 		delete [] ((unsigned*)stack);
@@ -119,7 +119,7 @@ void PCB::waitToComplete(){
 
 Thread* PCB::getThreadById(ID id){
 	System::lock();
-	volatile PCB *ret = System::ListOfPCB->find(id);
+	volatile PCB *ret = System::listOfPCB->find(id);
 	System::unlock();
 
 	return ret->myThread;
@@ -129,7 +129,17 @@ Thread* PCB::getThreadById(ID id){
 
 
 
-
+int PCB::tick() volatile {
+	if(this->state == BLOCKED && isWaitingForSem && semWaitTimeLeft > 0){
+		semWaitTimeLeft--;
+		if(semWaitTimeLeft == 0){
+			state = READY;
+			Scheduler::put((PCB*)this);
+			return 1;
+		}
+	}
+	return 0;
+}
 
 
 

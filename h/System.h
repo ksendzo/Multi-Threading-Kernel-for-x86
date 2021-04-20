@@ -11,6 +11,7 @@
 class PCB;
 class PCBStack;
 class Idle;
+class KSemStack;
 
 class System {
 public:
@@ -18,7 +19,8 @@ public:
 	static volatile PCB* running;
 	static volatile PCB* mainPCB;
 	static volatile Idle* idle;
-	static PCBStack* ListOfPCB;
+	static PCBStack* listOfPCB;
+	static KSemStack* listOfSemaphores;
 
 	static volatile int isDispatch;
 	static volatile int lockCnt;
@@ -28,6 +30,8 @@ public:
 
 	static void lock();
 	static void unlock();
+
+	static void tickSemaphores();
 
 
 };
