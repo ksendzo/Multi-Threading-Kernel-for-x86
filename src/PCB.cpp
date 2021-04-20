@@ -44,6 +44,9 @@ PCB::PCB(StackSize stackSize, Time timeSlice, Thread* thread) {
 	this->stackSize = stackSize;
 	this->timeSlice = timeSlice;
 	this->waitingForMeStack = new PCBStack;
+	this->isWaitingForSem = 0;
+	this->semWaitTimeLeft = 0;
+	this->unblockedBySignal = 0;
 	if(thread != 0){
 		this->stack = new unsigned[stackSize];
 	#ifndef BCC_BLOCK_IGNORE

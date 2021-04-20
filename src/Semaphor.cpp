@@ -6,6 +6,7 @@
  */
 
 #include "Semaphor.h"
+#include "KerSem.h"
 
 Semaphore::Semaphore(int init) {
 
@@ -19,4 +20,14 @@ Semaphore::~Semaphore() {
 
 int Semaphore::val() const {
 	return myImpl->val();
+}
+
+
+int Semaphore::wait(Time maxTimeToWait){
+	return myImpl->wait(maxTimeToWait);
+}
+
+
+void Semaphore::signal(){
+	myImpl->signal();
 }

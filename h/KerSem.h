@@ -8,6 +8,10 @@
 #ifndef KERSEM_H_
 #define KERSEM_H_
 
+class PCBStack;
+
+typedef unsigned int Time;
+
 class KernelSem {
 public:
 	KernelSem(int init);
@@ -16,6 +20,14 @@ public:
 	int value;
 
 	int val() const;
+
+	PCBStack* blockedList;
+
+	int wait(Time t);
+	void signal();
+
+
+
 
 };
 

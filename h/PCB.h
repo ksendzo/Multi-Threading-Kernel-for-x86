@@ -32,6 +32,10 @@ public:
 	volatile State state;
 	volatile int timeSlice;
 
+	volatile int isWaitingForSem;
+	volatile int semWaitTimeLeft;
+	volatile int unblockedBySignal;
+
 	static ID idCnt;
 	volatile ID id;
 

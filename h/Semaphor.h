@@ -10,6 +10,8 @@
 
 class KernelSem;
 
+typedef unsigned int Time;
+
 class Semaphore {
 public:
 	Semaphore(int init = 1);

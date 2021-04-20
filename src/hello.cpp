@@ -10,6 +10,8 @@
 #include "PCB.h"
 #include <iostream.h>
 #include "System.h"
+#include "Semaphor.h"
+#include <stdlib.h>
 
 //class A: public Thread {
 //public:
@@ -68,17 +70,27 @@ void syncPrintf(char* pr, int a){
 	System::unlock();
 }
 
+void syncPrintf(char* pr, int a, int b, char c){
+	System::lock();
+	printf(pr, a, b, c);
+	System::unlock();
+}
 
 
 
 
 
+
+const int n = 5;
+int count = 10;
+
+Semaphore s(2);
 
 class TestThread : public Thread
 {
 public:
 
-	TestThread(): Thread() {};
+	TestThread(): Thread(){}
 	~TestThread()
 	{
 		waitToComplete();
@@ -91,68 +103,35 @@ protected:
 
 void TestThread::run()
 {
-	syncPrintf("Thread %d: loop1 starts\n", getId());
-
-	for(int i=0;i<32000;i++)
-	{
-		for (int j = 0; j < 32000; j++);
-	}
-
-	syncPrintf("Thread %d: loop1 ends, dispatch\n",getId());
-
-	dispatch();
-
-	syncPrintf("Thread %d: loop2 starts\n",getId());
-
-	for (int k = 0; k < 20000; k++);
-
-	syncPrintf("Thread %d: loop2 ends\n",getId());
-
-
+	s.wait(0);
+	cout<<"Thread "<<getId()<<" in critical section."<<endl;
+	for(unsigned int i=0;i<64000;i++)
+		for(unsigned int j=0;j<64000;j++);
+	cout << "Thread " << getId() << " finished critical section." << endl;
+	s.signal();
 }
 
-class WaitThread: public Thread
-{
-private:
-	TestThread *t1_,*t2_;
-
-public:
-	WaitThread(TestThread *t1, TestThread *t2): Thread()
-	{
-		t1_ = t1;
-		t2_ = t2;
-	};
-
-	~WaitThread()
-		{
-			waitToComplete();
-		}
-
-protected:
-
-	void run()
-	{
-		syncPrintf("Starting tests...\n");
-		t1_->waitToComplete();
-		syncPrintf("Test 1 completed!\n");
-		t2_->waitToComplete();
-		syncPrintf("Test 2 completed!\n");
-	}
-};
-
-void tick() {}
+void tick(){}
 
 int userMain(int argc, char** argv)
 {
-	syncPrintf("User main starts\n");
-	TestThread t1,t2;
-	WaitThread w(&t1,&t2);
-	t1.start();
-	t2.start();
-	w.start();
-	syncPrintf("User main ends\n");
-	return 16;
+	syncPrintf("Test starts.\n");
+	TestThread t[n];
+	int i;
+	for(i=0;i<n;i++)
+	{
+		t[i].start();
+	}
+	for(i=0;i<n;i++)
+	{
+		t[i].waitToComplete();
+	}
+	syncPrintf("Test ends.\n");
+	return 0;
 }
+
+
+
 
 
 
