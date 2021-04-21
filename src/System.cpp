@@ -72,13 +72,13 @@ void System::unlock(){
 
 
 void System::tickSemaphores(){
-	lock();
+	//lock();
 
 	for(volatile KernelSem *i = listOfSemaphores->first(); i != 0; i = listOfSemaphores->next()){
 		i->tick();
 	}
 
-	unlock();
+	//unlock();
 }
 
 

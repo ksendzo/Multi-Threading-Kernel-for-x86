@@ -28,9 +28,9 @@ KernelSem::KernelSem(int init) {
 }
 
 KernelSem::~KernelSem() {
+	System::lock();
 	if(!blockedList->isEmpty())
 		printf("ostalo je blokiranih niti na semaforu!\n");
-	System::lock();
 	delete blockedList;
 	System::listOfSemaphores->removeMe(this);
 	if(System::listOfSemaphores->isEmpty()){
@@ -42,7 +42,7 @@ KernelSem::~KernelSem() {
 
 
 int KernelSem::tick() volatile{		//	tikni sve niti koje su na ovom sem
-	System::lock();
+	//System::lock();
 
 	PCBStack* PCBToRemove = new PCBStack;
 
@@ -56,6 +56,7 @@ int KernelSem::tick() volatile{		//	tikni sve niti koje su na ovom sem
 	volatile PCB* temp = PCBToRemove->pop();
 
 	while(temp){
+		temp->unblockedBySignal = 0;
 		blockedList->removeMe(temp);
 		value++;
 //		printf("free\n");
@@ -64,7 +65,7 @@ int KernelSem::tick() volatile{		//	tikni sve niti koje su na ovom sem
 
 	delete PCBToRemove;
 
-	System::unlock();
+	//System::unlock();
 }
 
 
@@ -82,7 +83,8 @@ int KernelSem::wait(Time t){
 		System::unlock();
 		return 0;				// VIDI STA VRACA
 	}
-	else {						// zablokira se
+	else {		// zablokira se
+//		printf("wait\n");
 		System::running->state = PCB::BLOCKED;
 		blockedList->push(System::running);
 
@@ -112,6 +114,7 @@ void KernelSem::signal(){
 		System::unlock();
 		return;
 	}
+	printf("signal\n");
 	volatile PCB* sig = blockedList->pop();
 	sig->unblockedBySignal = 1;
 	sig->state = PCB::READY;

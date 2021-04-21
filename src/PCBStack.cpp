@@ -10,12 +10,11 @@
 
 PCBStack::PCBStack() {
 	top = 0;
-
+	bottom = 0;
+	iterator = 0;
 }
 
 PCBStack::~PCBStack() {
-
-
 
 }
 
@@ -23,18 +22,37 @@ PCBStack::~PCBStack() {
 
 void PCBStack::push(volatile PCB* newPCB) volatile {
 	top = new Node(newPCB, top);
+	if(bottom == 0)
+		bottom = top;
 }
 
 volatile PCB* PCBStack::pop() volatile {
 	if(isEmpty())
 		return 0;
 
-	Node *temp = top;
-	top = top->next;
-	volatile PCB* ret = temp->info;
-	temp->next = 0;
-	temp->info = 0;
-	delete temp;
+//	Node *temp = top;
+//	top = top->next;
+//	volatile PCB* ret = temp->info;
+//	temp->next = 0;
+//	temp->info = 0;
+//	delete temp;
+
+	Node* temp = top;
+	volatile PCB* ret;
+
+	if(top->next == 0){
+		ret = top->info;
+		delete top;
+		top = 0;
+	}
+	else {
+		while(temp->next->next != 0){
+			temp = temp->next;
+		}
+		ret = temp->next->info;
+		delete temp->next;
+		temp->next = 0;
+	}
 
 	return ret;
 }

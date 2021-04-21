@@ -6,15 +6,19 @@
  */
 
 #include "Semaphor.h"
+#include "System.h"
 #include "KerSem.h"
 
 Semaphore::Semaphore(int init) {
-
+	System::lock();
 	myImpl = new KernelSem(init);
+	System::unlock();
 }
 
 Semaphore::~Semaphore() {
-	// TODO Auto-generated destructor stub
+	System::lock();
+	delete myImpl;
+	System::unlock();
 }
 
 
@@ -29,5 +33,7 @@ int Semaphore::wait(Time maxTimeToWait){
 
 
 void Semaphore::signal(){
+	System::lock();
 	myImpl->signal();
+	System::unlock();
 }

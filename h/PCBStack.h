@@ -20,6 +20,7 @@ class PCBStack {
 	};
 
 	Node *top;
+	Node *bottom;
 	Node *iterator;
 public:
 	PCBStack();
