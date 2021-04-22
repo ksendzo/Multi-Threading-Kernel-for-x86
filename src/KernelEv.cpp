@@ -19,34 +19,33 @@ KernelEv::KernelEv(IVTNo ivtNo) {
 	creatorPCB = System::running;
 	printf("created Kernel Event %d \n", ivtNo);
 	this->ivtNo = ivtNo;
-	this->value = 0;
 	this->blocked = 0;
 	IVTEntry::IVTEntryArray[ivtNo] = this;
 	System::unlock();
 }
 
 KernelEv::~KernelEv() {
-	// TODO Auto-generated destructor stub
+	IVTEntry::IVTEntryArray[ivtNo] = 0;
 }
 
 
 void KernelEv::wait() {
 	System::lock();
 	if(creatorPCB != System::running){
-//		printf("pogresna nit\n");
+		printf("pogresna nit\n");
 		System::unlock();
 		return;
 	}
-	if(value) {
-		value = 0;
-//		printf("samo proslo\n");
+	if(blocked) {
+//		value = 0;
+		printf("duplo blokiranje, nesto ne valja\n");
 		System::unlock();
 		return;
 	}
 	else {
 		creatorPCB->state = PCB::BLOCKED;
 		blocked = 1;
-//		printf("blkirao nit\n");
+		printf("blkirao nit\n");
 		System::unlock();
 		dispatch();
 	}
@@ -54,17 +53,15 @@ void KernelEv::wait() {
 
 
 void KernelEv::signal() {
-	System::lock();
-
-	if(blocked == 0) {
-		value = 1;
-		printf("Event signal no blocked\n");
-	}
-	else {
+//	System::lock();
+	if(blocked) {
 		printf("Event signal unblock\n");
 		creatorPCB->state = PCB::READY;
 		Scheduler::put((PCB*)creatorPCB);
 		blocked = 0;
 	}
-	System::unlock();
+	else {
+		printf("Event signal no blocked\n");
+	}
+//	System::unlock();
 }

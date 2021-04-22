@@ -10,7 +10,7 @@
 
 typedef unsigned char IVTNo;
 typedef void interrupt (*pInterrupt) (...);
-//class IVTEntry;
+class IVTEntry;
 class KernelEv;
 
 #define PREPAREENTRY(numEntry, callOldFlag)\
@@ -21,7 +21,6 @@ void interrupt inter##numEntry(...) {\
 	if (callOldFlag == 1) newEntry##numEntry.callOld();\
 }
 
-//KernelEv* IVTEntryArray[256];
 
 class IVTEntry{
 public:
@@ -29,12 +28,10 @@ public:
 	~IVTEntry();
 	void signal();
 	void callOld();
-	void setKerEv(KernelEv*);
 	static KernelEv* IVTEntryArray[256];
 private:
 	pInterrupt oldRout;
-	KernelEv* myKernelEvent;
-	int myEntry;
+	volatile int myEntryNo;
 
 };
 

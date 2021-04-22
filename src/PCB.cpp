@@ -84,9 +84,10 @@ PCB::~PCB() {
 	waitToComplete();
 	System::lock();
 	System::listOfPCB->removeMe(this);
-	System::unlock();
+
 	if(stack != 0)
 		delete [] ((unsigned*)stack);
+	System::unlock();
 
 }
 

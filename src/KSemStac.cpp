@@ -11,6 +11,7 @@
 
 KSemStack::KSemStack() {
 	topNode = 0;
+	iterator = 0;
 }
 
 KSemStack::~KSemStack() {

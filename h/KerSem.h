@@ -22,7 +22,7 @@ public:
 	int val() const;
 
 	PCBStack* blockedList;
-	int tick() volatile;
+	void tick() volatile;
 
 	int wait(Time t);
 	void signal();

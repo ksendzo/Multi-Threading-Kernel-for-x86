@@ -85,12 +85,6 @@ void syncPrintf(char* pr, int a, int b, char c){
 }
 
 
-
-
-
-#include <iostream.h>
-#include <stdlib.h>
-
 PREPAREENTRY(9,1);
 
 Semaphore* mutex = 0;
@@ -114,6 +108,8 @@ public:
 				cout << znak;
 				mutex->signal();
 			}
+			else
+				cout << ".";
 
 			// for (int j = 0; j < 10000; j++)
 				// for (int k = 0; k < 10000; k++);
@@ -201,13 +197,6 @@ int userMain(int argc, char* argv[]) {
 
 	return 0;
 }
-
-
-
-
-
-
-
 
 
 

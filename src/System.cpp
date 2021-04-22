@@ -36,7 +36,7 @@ void System::init() {
 
 void System::reset(){
 	restoreTimer();
-	System::running->state = PCB::FINISHED;
+	System::mainPCB->state = PCB::FINISHED;
 	delete System::mainPCB;
 //	delete System::running;
 	delete System::idle;
@@ -52,11 +52,18 @@ void System::reset(){
 }
 
 
-
+volatile unsigned int flagVal = 0;
 
 void System::lock() {
-	if(lockCnt == 0)
-		asm cli;
+	if(lockCnt == 0){
+		asm {
+			pushf
+			pop flagVal
+			cli
+		}
+//		asm cli;
+	}
+
 	lockCnt--;
 //	printf("-%d-\n", lockCnt);
 }
@@ -64,8 +71,13 @@ void System::lock() {
 void System::unlock(){
 	if(lockCnt < 0)
 		lockCnt++;
-	if(lockCnt == 0)
-		asm sti;
+	if(lockCnt == 0){
+		asm {
+			push flagVal
+			popf
+		}
+	}
+//		asm popf;
 //	printf("+%d+\n", lockCnt);
 
 }

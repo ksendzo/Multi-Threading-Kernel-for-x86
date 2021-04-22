@@ -16,7 +16,7 @@
 
 //extern volatile PCB* System::running;
 
-void dispatch();
+//void dispatch();
 
 
 Thread::Thread(StackSize stackSizeParam, Time timeSlice) {

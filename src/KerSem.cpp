@@ -41,7 +41,7 @@ KernelSem::~KernelSem() {
 }
 
 
-int KernelSem::tick() volatile{		//	tikni sve niti koje su na ovom sem
+void KernelSem::tick() volatile{		//	tikni sve niti koje su na ovom sem
 	//System::lock();
 
 	PCBStack* PCBToRemove = new PCBStack;
@@ -90,9 +90,6 @@ int KernelSem::wait(Time t){
 
 		if(t == 0){
 			System::running->isWaitingForSem = 0;
-		}
-		else if(t < 0){
-			printf("wait time < 0\n");
 		}
 		else {
 			System::running->isWaitingForSem = 1;
