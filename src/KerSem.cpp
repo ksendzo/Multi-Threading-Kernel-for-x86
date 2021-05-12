@@ -81,7 +81,7 @@ int KernelSem::wait(Time t){
 //	printf("wait = %d\n", value);
 	if(value >= 0){				// ima dovoljno val da samo nastavi daje
 		System::unlock();
-		return 0;				// VIDI STA VRACA
+		return 1;				// VIDI STA VRACA
 	}
 	else {		// zablokira se
 //		printf("wait\n");
@@ -111,7 +111,7 @@ void KernelSem::signal(){
 		System::unlock();
 		return;
 	}
-	printf("signal\n");
+//	printf("signal\n");
 	volatile PCB* sig = blockedList->pop();
 	sig->unblockedBySignal = 1;
 	sig->state = PCB::READY;

@@ -19,9 +19,10 @@ void dispatch();
 ID PCB::idCnt = 0;
 
 void PCB::wrapper(){
-	cout << "\n\t\t\tWrapper :D\n";
+//	cout << "\n\t\t\tWrapper :D\n";
 
-	if(System::running != 0){
+	if(System::running != 0 && System::running->id != 0){
+
 		(System::running)->myThread->run();
 		(System::running)->state = PCB::FINISHED;
 
@@ -30,10 +31,13 @@ void PCB::wrapper(){
 			volatile PCB* temp = System::running->waitingForMeStack->pop();
 			temp->state = READY;
 			Scheduler::put((PCB*)temp);
+//			printf("odblokirano %d\n", temp->id);
 		}
+//		printf("\n \t\t\t nit %d gotova\n", System::running->id);
 		System::unlock();
 
 	}
+
 	dispatch();
 }
 
@@ -50,20 +54,21 @@ PCB::PCB(StackSize stackSize, Time timeSlice, Thread* thread) {
 	if(thread != 0){
 		this->stack = new unsigned[stackSize];
 	#ifndef BCC_BLOCK_IGNORE
-		stack[stackSize - 1] = 0x200;
+		this->stack[stackSize - 1] = 0x200;
 
-		stack[stackSize - 2] = FP_SEG(&(PCB::wrapper));
-		stack[stackSize - 3] = FP_OFF(&(PCB::wrapper));
+		this->stack[stackSize - 2] = FP_SEG(&(PCB::wrapper));
+		this->stack[stackSize - 3] = FP_OFF(&(PCB::wrapper));
 
-		ss = FP_SEG(stack + stackSize - 12);
-		sp = FP_OFF(stack + stackSize - 12);
-		bp = FP_OFF(stack + stackSize - 12);
+		this->ss = FP_SEG(stack + stackSize - 12);
+		this->sp = FP_OFF(stack + stackSize - 12);
+		this->bp = FP_OFF(stack + stackSize - 12);
 	#endif
-
-		state = CREATED;
+		this->state = CREATED;
 	}
 	else {
-		state = READY;
+		this->stack = 0;
+		this->state = READY;
+//		printf("nulta nit kreirana\n");
 	}
 	System::listOfPCB->push(this);
 	System::unlock();
@@ -106,9 +111,10 @@ void PCB::waitToComplete(){
 		printf("zoves waitToComplete samog sebe...\n");
 
 	}
-	if(state != FINISHED){
+	if(this->state != FINISHED){
 		System::running->state = BLOCKED;
-		waitingForMeStack->push(System::running);
+		this->waitingForMeStack->push(System::running);
+//		printf("nit %d nije gotova -> blokirana je %d\n", this->id, System::running->id);
 		System::unlock();
 		dispatch();
 	}
@@ -133,8 +139,11 @@ Thread* PCB::getThreadById(ID id){
 int PCB::tick() volatile {
 	if(this->state == BLOCKED && isWaitingForSem && semWaitTimeLeft > 0){
 		semWaitTimeLeft--;
+		//printf("ceka na semaforu %d\n", semWaitTimeLeft);
 		if(semWaitTimeLeft == 0){
+		//	printf("END SEM WAIT\n");
 			state = READY;
+			unblockedBySignal = 0;
 			Scheduler::put((PCB*)this);
 			return 1;
 		}

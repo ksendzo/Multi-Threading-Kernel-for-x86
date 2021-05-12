@@ -61,6 +61,7 @@ void System::lock() {
 			pop flagVal
 			cli
 		}
+//		printf("\n.");
 //		asm cli;
 	}
 
@@ -72,11 +73,14 @@ void System::unlock(){
 	if(lockCnt < 0)
 		lockCnt++;
 	if(lockCnt == 0){
+//		printf("\nunlock\n");
 		asm {
 			push flagVal
 			popf
 		}
 	}
+	else if(isDispatch)
+		printf("DISPATCH LOCKED\n");
 //		asm popf;
 //	printf("+%d+\n", lockCnt);
 

@@ -28,8 +28,9 @@ Thread::Thread(StackSize stackSizeParam, Time timeSlice) {
 
 Thread::~Thread() {
 	myPCB->waitToComplete();
-	if(myPCB != 0)
+	if(myPCB != 0){
 		delete myPCB;
+	}
 }
 
 
@@ -68,7 +69,6 @@ Thread* Thread::getThreadById(ID id){
 volatile PCB* Thread::getMyPCB() volatile {
 	return (volatile PCB*)myPCB;
 }
-
 
 
 
