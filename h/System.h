@@ -12,6 +12,7 @@ class PCB;
 class PCBStack;
 class Idle;
 class KSemStack;
+typedef void interrupt (*pInterrupt) (...);
 
 class System {
 public:
@@ -21,6 +22,9 @@ public:
 	static volatile Idle* idle;
 	static PCBStack* listOfPCB;
 	static KSemStack* listOfSemaphores;
+
+	static volatile pInterrupt oldTimer;
+	static volatile pInterrupt old96;
 
 	static volatile int isDispatch;
 	static volatile int lockCnt;

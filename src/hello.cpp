@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include "Event.h"
 #include "IVTEntry.h"
+#include "DOS.H"
+
 
 //class A: public Thread {
 //public:
@@ -202,16 +204,16 @@
 
 
 int userMain(int argc, char* argv[]);
+//class KernelEv;
+//KernelEv* IVTEntryArray[256];
 int main(int argc, char* argv[])
 {
-	System::init(); 	// pocetni running
-
-//	doSomething();
+	System::init();
 
 	userMain(argc, argv);
-//	syncPrintf("Kraj userMain();\n");
 
 	System::reset();
+
 	return 0;
 }
 

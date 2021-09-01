@@ -20,30 +20,41 @@ volatile Idle* System::idle = 0;
 PCBStack* System::listOfPCB = 0;
 KSemStack* System::listOfSemaphores = 0;
 
+volatile pInterrupt System::oldTimer = 0;
+volatile pInterrupt System::old96 = 0;
+
 
 volatile int System::isDispatch = 0;
 volatile int System::lockCnt = 0;
 
 void inicTimer();
 void restoreTimer();
+void interrupt timer(...);
 
 void System::init() {
-	inicTimer();
+//	inicTimer();
+	oldTimer = getvect(8);
+	setvect(8, timer);
+	old96 = getvect(96);
+	setvect(96, oldTimer);
 	System::running = System::mainPCB = new PCB(0, 1);
 	System::idle = new Idle;
 	System::listOfPCB = new PCBStack;
 }
 
 void System::reset(){
-	restoreTimer();
+//	restoreTimer();
+	setvect(8, oldTimer);
+	setvect(96, old96);
 	System::mainPCB->state = PCB::FINISHED;
 	delete System::mainPCB;
 //	delete System::running;
 	delete System::idle;
 	if(System::listOfPCB){
-		if(!listOfPCB->isEmpty())
-			printf("lista PCB nije prazna\n");
-		delete System::listOfPCB;
+		if(System::listOfPCB->isEmpty())
+			delete System::listOfPCB;
+//			printf("lista PCB nije prazna\n");
+
 	}
 	if(System::listOfSemaphores){
 		if(System::listOfSemaphores->isEmpty())

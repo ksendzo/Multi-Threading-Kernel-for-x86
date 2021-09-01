@@ -16,7 +16,7 @@ void restoreTimer();
 //}
 void tick();
 // nova prekidna rutina tajmera
-void interrupt timer(){
+void interrupt timer(...){
 	static unsigned tsp, tss, tbp;
 	static unsigned int timerCnt = 0;
 	if (!System::isDispatch){
@@ -71,7 +71,8 @@ void interrupt timer(){
 	// poziva se samo kada nije zahtevana promena konteksta
 	// tako da se stara rutina poziva
 	// samo kada je stvarno doslo do prekida
-	if(!System::isDispatch) asm int 60h;
+	if(!System::isDispatch) // asm int 60h;
+		System::oldTimer();
 
 	System::isDispatch = 0;
 }

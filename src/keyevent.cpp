@@ -12,6 +12,7 @@
 #include "intLock.h"
 #include <event.h>
 #include "IVTEntry.h"
+#include <STDIO.H>
 
 PREPAREENTRY(9,0);
   
@@ -49,7 +50,9 @@ void KeyboardEvent::run()
 	while (!theEnd) {
       
 		event9.wait();
+//		printf("\t event signal came\n");
 		do{
+//			printf("\t i'm reading\n");
 			status = inportb(0x64); // ocitava statusni reg. sa 64h
 
 

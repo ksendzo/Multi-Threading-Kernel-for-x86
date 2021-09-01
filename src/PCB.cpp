@@ -98,7 +98,7 @@ PCB::~PCB() {
 
 
 void PCB::start(){
-	cout << "Scheduler\n";
+//	cout << "Scheduler\n";
 	state = READY;
 	Scheduler::put(this);
 }
@@ -107,10 +107,10 @@ void PCB::start(){
 void PCB::waitToComplete(){
 	System::lock();
 
-	if(System::running == this && System::running != System::mainPCB){		// ovo ne bi trebalo nikad da se desi...
-		printf("zoves waitToComplete samog sebe...\n");
-
-	}
+//	if(System::running == this && System::running != System::mainPCB){		// ovo ne bi trebalo nikad da se desi...
+//		printf("zoves waitToComplete samog sebe...\n");
+//
+//	}
 	if(this->state != FINISHED){
 		System::running->state = BLOCKED;
 		this->waitingForMeStack->push(System::running);

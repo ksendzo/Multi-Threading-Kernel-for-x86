@@ -29,8 +29,8 @@ KernelSem::KernelSem(int init) {
 
 KernelSem::~KernelSem() {
 	System::lock();
-	if(!blockedList->isEmpty())
-		printf("ostalo je blokiranih niti na semaforu!\n");
+//	if(!blockedList->isEmpty())
+//		printf("ostalo je blokiranih niti na semaforu!\n");
 	delete blockedList;
 	System::listOfSemaphores->removeMe(this);
 	if(System::listOfSemaphores->isEmpty()){

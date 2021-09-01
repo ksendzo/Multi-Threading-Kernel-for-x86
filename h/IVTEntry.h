@@ -30,7 +30,7 @@ public:
 	void callOld();
 	static KernelEv* IVTEntryArray[256];
 private:
-	pInterrupt oldRout;
+	volatile pInterrupt oldRout;
 	volatile int myEntryNo;
 
 };
