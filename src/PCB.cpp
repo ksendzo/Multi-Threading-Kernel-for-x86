@@ -9,18 +9,14 @@
 #include "System.h"
 #include <dos.h>
 #include "Thread.h"
-#include <iostream.h>
 #include "PCBStack.h"
 #include "SCHEDULE.H"
-#include <stdio.h>
 
 void dispatch();
 
 ID PCB::idCnt = 0;
 
 void PCB::wrapper(){
-//	cout << "\n\t\t\tWrapper :D\n";
-
 	if(System::running != 0 && System::running->id != 0){
 
 		(System::running)->myThread->run();
@@ -31,11 +27,8 @@ void PCB::wrapper(){
 			volatile PCB* temp = System::running->waitingForMeStack->pop();
 			temp->state = READY;
 			Scheduler::put((PCB*)temp);
-//			printf("odblokirano %d\n", temp->id);
 		}
-//		printf("\n \t\t\t nit %d gotova\n", System::running->id);
 		System::unlock();
-
 	}
 
 	dispatch();
@@ -68,22 +61,10 @@ PCB::PCB(StackSize stackSize, Time timeSlice, Thread* thread) {
 	else {
 		this->stack = 0;
 		this->state = READY;
-//		printf("nulta nit kreirana\n");
 	}
 	System::listOfPCB->push(this);
 	System::unlock();
 }
-
-//PCB::PCB(){		// za pocetnu nit
-//	System::lock();
-////	timeSlice = 2;
-//	state = READY;
-//	myThread = 0;
-//	System::ListOfPCB->push(this);
-//	waitingForMeStack = new PCBStack;
-//	id = idCnt++;
-//	System::unlock();
-//}
 
 PCB::~PCB() {
 	waitToComplete();
@@ -98,7 +79,6 @@ PCB::~PCB() {
 
 
 void PCB::start(){
-//	cout << "Scheduler\n";
 	state = READY;
 	Scheduler::put(this);
 }
@@ -106,21 +86,14 @@ void PCB::start(){
 
 void PCB::waitToComplete(){
 	System::lock();
-
-//	if(System::running == this && System::running != System::mainPCB){		// ovo ne bi trebalo nikad da se desi...
-//		printf("zoves waitToComplete samog sebe...\n");
-//
-//	}
 	if(this->state != FINISHED){
 		System::running->state = BLOCKED;
 		this->waitingForMeStack->push(System::running);
-//		printf("nit %d nije gotova -> blokirana je %d\n", this->id, System::running->id);
 		System::unlock();
 		dispatch();
 	}
 	else
 		System::unlock();
-
 }
 
 
@@ -139,9 +112,7 @@ Thread* PCB::getThreadById(ID id){
 int PCB::tick() volatile {
 	if(this->state == BLOCKED && isWaitingForSem && semWaitTimeLeft > 0){
 		semWaitTimeLeft--;
-		//printf("ceka na semaforu %d\n", semWaitTimeLeft);
 		if(semWaitTimeLeft == 0){
-		//	printf("END SEM WAIT\n");
 			state = READY;
 			unblockedBySignal = 0;
 			Scheduler::put((PCB*)this);
@@ -150,8 +121,3 @@ int PCB::tick() volatile {
 	}
 	return 0;
 }
-
-
-
-
-

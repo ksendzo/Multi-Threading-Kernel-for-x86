@@ -10,7 +10,6 @@
 #include "SCHEDULE.H"
 #include "PCB.h"
 #include "IVTEntry.h"
-#include <stdio.h>
 
 void dispatch();
 
@@ -20,16 +19,12 @@ KernelEv::KernelEv(IVTNo ivtNo) {
 	this->ivtNo = ivtNo;
 	this->blocked = 0;
 	IVTEntry::IVTEntryArray[ivtNo] = this;
-//	printf("KernelEv added to IVTEntryArray[%d]\n", ivtNo);
-//	for(int i = 0; i < 256; i ++)
-//			if(IVTEntry::IVTEntryArray[i] != 0) printf("%d  -> %d\t", i, IVTEntry::IVTEntryArray[i]);
 	System::unlock();
 }
 
 KernelEv::~KernelEv() {
 	System::lock();
 	IVTEntry::IVTEntryArray[ivtNo] = 0;
-//	printf("KernelEv removied from IVTEntryArray[%d]\n", ivtNo);
 	System::unlock();
 }
 

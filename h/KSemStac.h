@@ -33,8 +33,6 @@ public:
 	volatile KernelSem* next() volatile;
 
 	int isEmpty() volatile;
-
-//	volatile KernelSem* find(ID id) volatile;
 };
 
 #endif /* KSEMSTAC_H_ */

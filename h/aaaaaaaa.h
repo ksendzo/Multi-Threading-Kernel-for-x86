@@ -1,28 +1,47 @@
 /*
  * aaaaaaaa.h
  *
- *  Created on: Apr 16, 2021
+ *  Created on: Aug 26, 2020
  *      Author: OS1
  */
 
-#ifndef AAAAAAAA_H_
-#define AAAAAAAA_H_
+#ifndef H_AAAAAAAA_H_
+#define H_AAAAAAAA_H_
 
 class PCB;
-void dispatch();
-void wrapper();
+template <class T>
+class List;
+class KernelSem;
+class KernelEv;
 
- //unsigned tsp, tss, tbp;
+PCB* nultaNit;
+PCB* running;
 
-volatile int cntr =0;
-volatile int context_switch_on_demand = 0;
+unsigned tsp;
+unsigned tss;
 
-//unsigned oldTimerOFF, oldTimerSEG;
-
-volatile PCB* p[3];
-volatile PCB* running;
-
-
+int nextThread;
+List<KernelSem> *listOfKernelSem;
+static int numSem = 0;
 
 
-#endif /* AAAAAAAA_H_ */
+int syncPrintf(const char *format, ...);
+
+// potpis interrupt rutine za rad sa setvect() i getvect()
+typedef void interrupt (*pInterrupt)(...);
+
+// stara prekidna rutina
+pInterrupt oldISR;
+
+volatile int brojac = 20;
+volatile int zahtevana_promena_konteksta = 0;
+volatile int signal_u_toku = 0;
+volatile int lockFlag = 0;
+volatile int bilo_je_zahteva = 0;
+
+volatile int globalBlockedSignals[16];
+
+KernelEv* IVTEntryArray[256];
+
+
+#endif /* H_AAAAAAAA_H_ */

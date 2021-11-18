@@ -6,18 +6,12 @@
  */
 
 #include "Thread.h"
-//#include "aaaaaaaa.h"
 #include "PCB.h"
 #include <dos.h>
 #include <iostream.h>
 #include "SCHEDULE.H"
 #include <stdio.h>
 #include "System.h"
-
-//extern volatile PCB* System::running;
-
-//void dispatch();
-
 
 Thread::Thread(StackSize stackSizeParam, Time timeSlice) {
 	myPCB = new PCB(
@@ -41,11 +35,7 @@ void Thread::start(){
 
 
 void Thread::waitToComplete(){
-//	if(myPCB == NULL)
-//		printf("PCB == 0 waitToComplete\n");
-//	else
-//	printf("PCB->id = %d\n", )
-		myPCB->waitToComplete();
+	myPCB->waitToComplete();
 }
 
 

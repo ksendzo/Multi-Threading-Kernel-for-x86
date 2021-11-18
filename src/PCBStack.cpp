@@ -30,13 +30,6 @@ volatile PCB* PCBStack::pop() volatile {
 	if(isEmpty())
 		return 0;
 
-//	Node *temp = top;
-//	top = top->next;
-//	volatile PCB* ret = temp->info;
-//	temp->next = 0;
-//	temp->info = 0;
-//	delete temp;
-
 	Node* temp = top;
 	volatile PCB* ret;
 

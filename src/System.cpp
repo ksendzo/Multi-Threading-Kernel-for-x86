@@ -27,33 +27,32 @@ volatile pInterrupt System::old96 = 0;
 volatile int System::isDispatch = 0;
 volatile int System::lockCnt = 0;
 
-void inicTimer();
-void restoreTimer();
 void interrupt timer(...);
 
 void System::init() {
 //	inicTimer();
+#ifndef BCC_BLOCK_IGNORE
 	oldTimer = getvect(8);
 	setvect(8, timer);
 	old96 = getvect(96);
 	setvect(96, oldTimer);
+#endif
 	System::running = System::mainPCB = new PCB(0, 1);
 	System::idle = new Idle;
 	System::listOfPCB = new PCBStack;
 }
 
 void System::reset(){
-//	restoreTimer();
+#ifndef BCC_BLOCK_IGNORE
 	setvect(8, oldTimer);
 	setvect(96, old96);
+#endif
 	System::mainPCB->state = PCB::FINISHED;
 	delete System::mainPCB;
-//	delete System::running;
 	delete System::idle;
 	if(System::listOfPCB){
 		if(System::listOfPCB->isEmpty())
 			delete System::listOfPCB;
-//			printf("lista PCB nije prazna\n");
 
 	}
 	if(System::listOfSemaphores){
@@ -72,19 +71,15 @@ void System::lock() {
 			pop flagVal
 			cli
 		}
-//		printf("\n.");
-//		asm cli;
 	}
 
 	lockCnt--;
-//	printf("-%d-\n", lockCnt);
 }
 
 void System::unlock(){
 	if(lockCnt < 0)
 		lockCnt++;
 	if(lockCnt == 0){
-//		printf("\nunlock\n");
 		asm {
 			push flagVal
 			popf
@@ -92,20 +87,14 @@ void System::unlock(){
 	}
 	else if(isDispatch)
 		printf("DISPATCH LOCKED\n");
-//		asm popf;
-//	printf("+%d+\n", lockCnt);
 
 }
 
 
 void System::tickSemaphores(){
-	//lock();
-
 	for(volatile KernelSem *i = listOfSemaphores->first(); i != 0; i = listOfSemaphores->next()){
 		i->tick();
 	}
-
-	//unlock();
 }
 
 

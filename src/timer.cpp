@@ -6,14 +6,7 @@
 #include "System.h"
 #include "Idle.h"
 
-//extern volatile int System::isDispatch;
 
-void inicTimer();
-void restoreTimer();
-
-//void tick(){
-//	printf(".");
-//}
 void tick();
 // nova prekidna rutina tajmera
 void interrupt timer(...){
@@ -38,9 +31,6 @@ void interrupt timer(...){
 		System::running->ss = tss;
 		System::running->bp = tbp;
 
-//		if(System::running->state == PCB::FINISHED)
-//			printf("gotova nit\n");
-
 		if(System::running->state == PCB::READY){
 			Scheduler::put((PCB*)System::running);
 		}
@@ -48,7 +38,6 @@ void interrupt timer(...){
 		System::running = Scheduler::get();
 
 		if(System::running == 0){
-//			printf("idle\n");
 			System::running = System::idle->getMyPCB();
 		}
 
@@ -75,60 +64,4 @@ void interrupt timer(...){
 		System::oldTimer();
 
 	System::isDispatch = 0;
-}
-
-
-unsigned oldTimerOFF, oldTimerSEG;
-
-// postavlja novu prekidnu rutinu
-void inicTimer(){
-	asm{
-		cli
-		push es
-		push ax
-
-		mov ax,0
-		mov es,ax // es = 0
-
-		// pamti staru rutinu
-		mov ax, word ptr es:0022h
-		mov word ptr oldTimerSEG, ax
-		mov ax, word ptr es:0020h
-		mov word ptr oldTimerOFF, ax
-
-		// postavlja novu rutinu
-		mov word ptr es:0022h, seg timer
-		mov word ptr es:0020h, offset timer
-
-		// postavlja staru rutinu na int 60h
-		mov ax, oldTimerSEG
-		mov word ptr es:0182h, ax
-		mov ax, oldTimerOFF
-		mov word ptr es:0180h, ax
-
-		pop ax
-		pop es
-		sti
-	}
-}
-
-// vraca staru prekidnu rutinu
-void restoreTimer(){
-	asm {
-		cli
-		push es
-		push ax
-
-		mov ax,0
-		mov es,ax
-
-		mov ax, word ptr oldTimerSEG
-		mov word ptr es:0022h, ax
-		mov ax, word ptr oldTimerOFF
-		mov word ptr es:0020h, ax
-
-		pop ax
-		pop es
-		sti
-	}
 }

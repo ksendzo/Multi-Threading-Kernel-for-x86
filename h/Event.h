@@ -1,15 +1,17 @@
 /*
  * Event.h
  *
- *  Created on: Apr 20, 2021
+ *  Created on: Aug 11, 2020
  *      Author: OS1
  */
 
 #ifndef EVENT_H_
 #define EVENT_H_
+#include "KernelEv.h"
+#include "IVTEntry.h"
 
 typedef unsigned char IVTNo;
-class KernelEv;
+//class KernelEv;
 
 class Event {
 public:
@@ -20,10 +22,30 @@ public:
 
 protected:
 	friend class KernelEv;
-	void signal();	// can call KernelEv
+	//friend class IVTEntry;
+	void signal(); // can call Kernel
 
 private:
 	KernelEv* myImpl;
 };
+
+Event::Event(IVTNo ivtNo){
+	lock();
+	myImpl = new KernelEv(ivtNo);
+	unlock();
+}
+
+Event::~Event(){
+	delete myImpl;
+}
+
+void Event::wait(){
+	myImpl->wait();
+}
+
+void Event::signal(){
+	myImpl->signal();
+}
+
 
 #endif /* EVENT_H_ */
